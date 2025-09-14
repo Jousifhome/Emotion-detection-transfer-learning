@@ -1,6 +1,133 @@
-def main():
-    print("Hello from emotion-detection-transfer-learning!")
+import cv2
+import torch
+import tkinter as tk
+from tkinter import filedialog
+from PIL import Image, ImageTk
+import torchvision.transforms as transforms
+
+# ===== Load Model =====
+
+import torch.nn as nn
+from torchvision import transforms, models
 
 
+# --- Config ---
+num_classes = 7
+save_path = r"../../src/models/Final_ModelV2.pth"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# --- Transform ---
+transform = transforms.Compose([
+    transforms.Resize((224,224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                         std=[0.229, 0.224, 0.225])
+])
+
+# --- Model ---
+model = models.resnet18(weights=None)  # no pretrained, matches your training
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+model.load_state_dict(torch.load(save_path, map_location=device))
+model = model.to(device)
+model.eval()
+
+# --- Emotion labels ---
+emotions = {0:"Angry", 1:"Disgust", 2:"Fear", 3:"Happy", 4:"Neutral", 5:"Sad", 6:"Surprised"}
+
+def predict_emotion(pil_img):
+    input_img = transform(pil_img).unsqueeze(0)
+    with torch.no_grad():
+        outputs = model(input_img)
+        _, predicted = torch.max(outputs, 1)
+    return emotions[predicted.item()]
+
+# ===== GUI App =====
+class EmotionApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Emotion Detection (Tkinter)")
+        self.root.geometry("700x600")
+
+        # Video/Image display
+        self.label_img = tk.Label(self.root)
+        self.label_img.pack()
+
+        # Result text
+        self.result_label = tk.Label(self.root, text="Result: None", font=("Arial", 16), fg="blue")
+        self.result_label.pack()
+
+        # Buttons
+        btn_frame = tk.Frame(self.root)
+        btn_frame.pack(pady=10)
+
+        self.btn_webcam = tk.Button(btn_frame, text="Use Webcam", command=self.start_webcam)
+        self.btn_webcam.grid(row=0, column=0, padx=10)
+
+        self.btn_browse = tk.Button(btn_frame, text="Browse Image", command=self.browse_image)
+        self.btn_browse.grid(row=0, column=1, padx=10)
+
+        self.btn_stop = tk.Button(btn_frame, text="Stop Webcam", command=self.stop_webcam)
+        self.btn_stop.grid(row=0, column=2, padx=10)
+
+        # Webcam variables
+        self.cap = None
+        self.running = False
+
+    def start_webcam(self):
+        self.cap = cv2.VideoCapture(0)
+        self.running = True
+        self.update_frame()
+
+    def stop_webcam(self):
+        self.running = False
+        if self.cap:
+            self.cap.release()
+            self.cap = None
+        self.label_img.config(image="")
+        self.result_label.config(text="Result: None")
+
+    def update_frame(self):
+        if self.running and self.cap:
+            ret, frame = self.cap.read()
+            if ret:
+                pil_img = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                emotion = predict_emotion(pil_img)
+
+                cv2.putText(frame, emotion, (20, 40),
+                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+                img_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                im_pil = Image.fromarray(img_rgb)
+                imgtk = ImageTk.PhotoImage(image=im_pil)
+
+                self.label_img.imgtk = imgtk
+                self.label_img.config(image=imgtk)
+
+                self.result_label.config(text=f"Result: {emotion}")
+
+            self.root.after(20, self.update_frame)
+
+    def browse_image(self):
+        file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.png")])
+        if file_path:
+            img = cv2.imread(file_path)
+            pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+            emotion = predict_emotion(pil_img)
+
+            cv2.putText(img, emotion, (20, 40),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            im_pil = Image.fromarray(img_rgb)
+            imgtk = ImageTk.PhotoImage(image=im_pil)
+
+            self.label_img.imgtk = imgtk
+            self.label_img.config(image=imgtk)
+
+            self.result_label.config(text=f"Result: {emotion}")
+
+# ===== Run App =====
 if __name__ == "__main__":
-    main()
+    root = tk.Tk()
+    app = EmotionApp(root)
+    root.mainloop()
