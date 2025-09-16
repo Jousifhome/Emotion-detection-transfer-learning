@@ -10,13 +10,12 @@ import os
 # -------------------------
 # Config
 # -------------------------
-data_dir = "C:/Users/HWA/Desktop/AI Project UV"   # <-- change to your dataset folder
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "src", "data"))  # <-- change to your dataset folder
 batch_size = 64
 num_epochs = 20
 num_classes = 7
 learning_rate = 0.001
-save_path = r"C:\Users\HWA\Desktop\AI Project UV\src\models\Final_ModelV2.pth"
-
+save_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "src", "models", "Final_ModelV2.pth"))
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 
