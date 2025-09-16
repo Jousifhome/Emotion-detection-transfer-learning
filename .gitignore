@@ -2,12 +2,6 @@
 <<<<<<< HEAD
 =======
 >>>>>>> yousif
-# Ignore train.zip in src/data
-src/data/train.zip
-# Ignore file named 'test' inside src/data
-src/data/test
-# Ignore file named 'trian' inside src/data
-src/data/trian
 
 <<<<<<< HEAD
 =======
