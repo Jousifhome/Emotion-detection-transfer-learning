@@ -1,0 +1,31 @@
+[project]
+name = "ai-project-uv"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi",
+    "matplotlib",
+    "opencv-python",
+    "paho-mqtt",
+    "python-multipart",
+    "requests>=2.32.5",
+    "scikit-learn",
+    "seaborn",
+    "torch",
+    "torchvision",
+    "uvicorn",
+]
+
+[tool.uv.sources]
+torch = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/torch-2.8.0+cu129-cp313-cp313-win_amd64.whl" }
+torchvision = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/torchvision-0.23.0+cu129-cp313-cp313-win_amd64.whl" }
+matplotlib = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/matplotlib-3.10.6-cp313-cp313-win_amd64.whl" }
+seaborn = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/seaborn-0.13.2-py3-none-any.whl" }
+scikit-learn = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/scikit_learn-1.7.2-cp313-cp313-win_amd64.whl" }
+opencv-python = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/opencv_python-4.12.0.88-cp37-abi3-win_amd64.whl" }
+paho-mqtt = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/Wheels/wheels/paho_mqtt-2.1.0-py3-none-any.whl" }
+fastapi = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/libraries/fastapi-0.115.13-py3-none-any.whl" }
+uvicorn = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/libraries/uvicorn-0.34.3-py3-none-any.whl" }
+python-multipart = { path = "D:/University/FifthYear/Labs/AI_Lab/Libraries/libraries/python_multipart-0.0.20-py3-none-any.whl" }
